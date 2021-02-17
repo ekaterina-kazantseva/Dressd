@@ -10,16 +10,6 @@ export default CameraView = () => {
 	
 	let camera: Camera;
 
-	/*
-	const __startCamera = async () => {
-		const {status} = await Camera.requestPermissionsAsync();
-		if(status === 'granted') {
-			setStartCamera(true);
-		}else {
-			Alert.alert("Access denied");
-		}
-	}; */
-
 	const __takePicture = async () => {
 	if (!camera) return;
 	const photo = await camera.takePictureAsync();
