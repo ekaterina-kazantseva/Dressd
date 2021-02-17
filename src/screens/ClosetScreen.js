@@ -1,216 +1,105 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, ImageBackground} from 'react-native';
-import {LinearGradient} from 'expo-linear-gradient';
-import {Camera} from 'expo-camera';
-import * as MediaLibrary from 'expo-media-library';
+import SubCategories from '../library/components/SubCategories';
+
+let topsCategories = [
+	{ name: 'Shirts', isExpanded: false},
+	{ name: 'T-Shirts', isExpanded: false},
+	{ name: 'Sweaters', isExpanded: false},
+	{ name: 'Blazers', isExpanded: false}
+]
+
+let botsCategories = [
+	{ name: 'Pants', isExpanded: false},
+	{ name: 'Shorts', isExpanded: false},
+	{ name: 'Skirts', isExpanded: false},
+]
+
+let accsCategories = [
+	{ name: 'Scarfs', isExpanded: false},
+	{ name: 'Bags', isExpanded: false},
+	{ name: 'Purses', isExpanded: false},
+	{ name: 'Jewelry', isExpanded: false}
+]
+
+let shoesCategories = [
+	{ name: 'Sneakers', isExpanded: false},
+	{ name: 'Pumps', isExpanded: false},
+	{ name: 'Stilletos', isExpanded: false},
+	{ name: 'Boots', isExpanded: false}
+]
+
+let dressRompersCategories = [ { name: 'Dresses', isExpanded: false} ]
+
+const allCategories = [
+	{group: topsCategories, name: "Tops", isExpanded: false},
+	{group: botsCategories, name: "Bottoms", isExpanded: false},
+	{group: accsCategories, name: "Accessories", isExpanded: false},
+	{group: shoesCategories, name: "Shoes", isExpanded: false},
+	{group: dressRompersCategories, name: "Dresses and Rompers", isExpanded: false}
+	]
+
 
 export default function ClosetScreen() {
-	const [startCamera, setStartCamera] = React.useState(false);
-	const [previewVisible, setPreviewVisible] = useState(false);
-	const [capturedImage, setCapturedImage] = useState(null);
 	
-	let camera: Camera;
+	const [buttonState, setButtonState] = useState([])
+	const [categoriesState, setNewCategories] = useState(allCategories)
 
-	const __startCamera = async () => {
-		const {status} = await Camera.requestPermissionsAsync();
-		if(status === 'granted') {
-			setStartCamera(true);
-		}else {
-			Alert.alert("Access denied");
+	const __changeCategories = (newSubCategories, index) => {
+		const newCategories = [...categoriesState];
+		newCategories[index] = { ...newCategories[index], group: newSubCategories };
+		setNewCategories(newCategories);
+	}
+
+	const handlePress = (state, idx) => {
+		const newArr = [...state]
+		newArr[idx] = !newArr[idx]
+		setButtonState(newArr)
+	}
+
+	useEffect(() => {
+		if(allCategories.length > 0) {
+			const initialState = allCategories.map(item => item.isExpanded)
+			setButtonState(initialState)
 		}
-	};
-
-	const __takePicture = async () => {
-	if (!camera) return;
-	const photo = await camera.takePictureAsync();
-	console.log(photo);
-	setPreviewVisible(true);
-	setCapturedImage(photo);
-	};
-
-	const __retakePicture = () => {
-		setCapturedImage(null);
-		setPreviewVisible(false);
-		__takePicture();
-	};
-
-	const __savePhoto = async () => {
-		const {status} = await MediaLibrary.requestPermissionsAsync();
-		if(status === 'granted') {
-			MediaLibrary.saveToLibraryAsync(capturedImage.uri);
-		} else {
-			Alert.alert("Access denied");
-		}
-	};
-
-	const CameraPreview = ({photo, retakePicture, savePhoto}: any) => {
-  		console.log('sdsfds', photo);
-  		return (
-   			 <View
-      			style={{
-        		backgroundColor: 'transparent',
-        		flex: 1,
-        		width: '100%',
-        		height: '100%',
-      			}}
-    		>
-      			<ImageBackground
-        			source={{uri: photo && photo.uri}}
-        			style={{
-          			flex: 1
-        			}}
-      			/>
-      				<TouchableOpacity
-      				onPress={__savePhoto}
-      				style={{
-      					position: 'absolute',
-      					bottom: 5,
-      					right: 10,
-      					backgroundColor: '#fff',
-      					borderRadius: 50,
-      					width: 90,
-      					height: 90,
-      					justifyContent: 'center'
-      				}}><Text style={{color: '#623AA2', fontSize: 15, fontFamily: 'Helvetica', alignSelf: 'center', fontWeight: 'bold'}}>Save</Text></TouchableOpacity>
-
-   	   				<TouchableOpacity
-      				onPress={__retakePicture}
-      				style={{
-      					position: 'absolute',
-      					bottom: 5,
-      					left: 10,
-      					backgroundColor: '#fff',
-      					borderRadius: 50,
-      					width: 90,
-      					height: 90,
-      					justifyContent: 'center'
-      				}}><Text style={{color: '#623AA2', fontSize: 15, fontFamily: 'Helvetica', alignSelf: 'center', fontWeight: 'bold'}}>Retake</Text></TouchableOpacity>
-    		</View>
-  		);
-	};
-
-		if(startCamera) {
-			if (previewVisible && capturedImage) {
-				return (
-					<CameraPreview 
-					photo={capturedImage}
-					savePhoto={__savePhoto}
-					retakePicture={__retakePicture} 
-					/>
-				);
-			}
-			return (
-			<Camera
-				style={{flex: 1, width: "100%"}}
-				ref={(r) => {camera = r}}
-				>
-				<View
-				style={{
-					flex: 1,
-					width: '100%',
-					backgroundColor: 'transparent',
-					flexDirection: 'row'
-				}}
-				>
-					<View
-					style={{
-						position: 'absolute',
-						bottom: 0,
-						flexDirection: 'row',
-						fles: 1,
-						width: '100%',
-						padding: 20,
-						justifyContent: 'space-between'
-					}}>
-						<View
-						style={{
-							alignSelf: 'center',
-							flex: 1,
-							alignItems: 'center'
-						}}>
-							<TouchableOpacity
-							onPress={__takePicture}
-							style={{
-								width: 70,
-								height: 70,
-								bottom: 0,
-								borderRadius: 50,
-								backgroundColor: '#fff'
-							}}
-							/>
-						</View>
-					</View>
-				</View>
-			</Camera>
-				);
-		}
+	}, [allCategories]);
 
 	return (
-		<LinearGradient
-		colors={['#f97794', '#623AA2']}
-		style={{
-			flex: 1,
-			alignItems: 'center',
-		}}
-		start={{ x: 0, y: 0}}
-		end={{ x: 1, y: 1}}
-		>
-			<TouchableOpacity
-				onPress={__startCamera}
-				style={style.addNewButton}>
-					<Text style={{fontFamily: 'Helvetica', 
-					fontWeight: 'bold', 
-					alignSelf: 'center',
-					fontSize: 38,
-					color: '#623AA2'}}>+</Text>
-				</TouchableOpacity>
 			<View 
-			style={{marginTop: 80}}>
-				<TouchableOpacity 
-				style={style.buttonStyle}>
-					<Text style={style.textStyle}>Tops</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-				style={style.buttonStyle}>
-					<Text style={style.textStyle}>Bottoms</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-				style={style.buttonStyle}>
-					<Text style={style.textStyle}>Accesories</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-				style={style.buttonStyle}>
-					<Text style={style.textStyle}>Shoes</Text>
-				</TouchableOpacity>
+			style={{backgroundColor: '#fff', flex: 1}}>
+				{categoriesState.map((item, idx) => <>
+					<TouchableOpacity
+						style={style.buttonStyle}
+						onPress = {() => handlePress(buttonState, idx)}>
+						<Text style={style.textStyle}>{item.name}</Text>
+					</TouchableOpacity>
+					<SubCategories showSubCategories={buttonState[idx]} categories={categoriesState[idx].group}
+					onChangeCategories={(newSubCategories, index) => __changeCategories(newSubCategories, index)} index={idx}/>
+				</>
+				)}
 			</View>
-		</LinearGradient>
 	);
 };
 
 const style = StyleSheet.create({
 	buttonStyle: {
-		marginTop: 40,
-		padding: 25,
+		padding: 10,
 		backgroundColor: 'white',
-		width: 125,
-		borderRadius: 10,
-	},
-	addNewButton: {
-		borderRadius: 25,
-		backgroundColor: 'white',
-		width: 50,
-		height: 50,
-		position: 'absolute',
-		alignSelf: 'flex-start',
-		marginTop: 25,
-		marginLeft: 15
+		width: '100%',
+		alignSelf: 'center',
+		borderBottomWidth: 1,
+		borderColor: 'rgba(0, 0, 0, 0.13)'
 	},
 	textStyle: {
-		fontFamily: 'Helvetica', 
-		fontWeight: 'bold', 
-		alignSelf: 'center',
-		color: '#623AA2'
+		fontFamily: 'montserrat-regular',
+		color: '#000',
+		fontSize: 20
+	},
+	subMenuText: {
+		fontFamily: 'roboto-light',
+		fontSize: 20,
+		color: 'rgba(0,0,0,0.5)',
+		paddingLeft: 20,
+		paddingTop: 5
 	}
 });
-
-//export default ClosetScreen;
