@@ -1,46 +1,54 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {LinearGradient} from 'expo-linear-gradient';
+import {View, Text, StyleSheet, TouchableOpacity, ImageBackground} from 'react-native';
+import ClosetImage from '../../assets/closet.png';
+import LooksImage from '../../assets/looks.png';
+import CalendarImage from '../../assets/calendar.png';
 
 const HomeScreen = ({navigation}) => {
+
 	return (
-	
-		<LinearGradient
-		colors={['#f97794', '#623AA2']}
-		style={{
-			flex: 1,
-			alignItems: 'center',
-		}}
-		start={{ x: 0, y: 0}}
-		end={{ x: 1, y: 1}}
-		>
-			<Text style={{fontFamily: 'Helvetica', fontWeight: 'bold', alignSelf: 'center', marginTop: 50, color: 'white', fontSize: 80}}>MyLook</Text>
-			<View 
-			style={{marginTop: 80}}>
-				<TouchableOpacity 
-				onPress = {() => navigation.navigate('Closet')}
-				style={style.buttonStyle}>
-					<Text style={{fontFamily: 'Helvetica', fontWeight: 'bold', alignSelf: 'flex-start', color: '#623AA2'}}>Closet</Text>
+		<View style={{backgroundColor: '#fff', flex: 1}}>
+				<TouchableOpacity onPress = {() => navigation.navigate('Closet')} style={style.buttonStyle}>
+					<ImageBackground source={ClosetImage} style={style.image}>
+						<Text style={style.text}>Closet</Text>
+					</ImageBackground>
 				</TouchableOpacity>
-				<TouchableOpacity
-				onPress = {() => navigation.navigate('Looks')}
-				style={style.buttonStyle}>
-					<Text style={{fontFamily: 'Helvetica', fontWeight: 'bold', alignSelf: 'flex-start', color: '#623AA2'}}>Looks</Text>
+				<TouchableOpacity onPress = {() => navigation.navigate('Looks')} style={style.buttonStyle}>
+					<ImageBackground source={LooksImage} style={style.image}>
+						<Text style={style.text}>Looks</Text>
+					</ImageBackground>
 				</TouchableOpacity>
-			</View>
-		</LinearGradient>
-		
+				<TouchableOpacity onPress = {() => navigation.navigate('Calendar')} style={style.buttonStyle}>
+					<ImageBackground source={CalendarImage} style={style.image}>
+						<Text style={style.text}>Calendar</Text>
+					</ImageBackground>
+				</TouchableOpacity>
+		</View>
 	);
 };
 
 const style = StyleSheet.create({
 	buttonStyle: {
-		marginTop: 40,
-		padding: 20,
-		backgroundColor: 'white',
-		width: 225,
-		borderRadius: 10,
+		marginBottom: 10,
+		padding: 0,
+		width: '100%',
+		height: '32%',
+	},
+	image: {
+		flex: 1,
+		resizeMode: 'cover',
+		alignItems: 'center',
+		justifyContent: 'center'
+	},
+	text: {
+		fontFamily: 'montserrat-bold',
+		alignSelf: 'center',
+		color: '#fff',
+		fontSize: 30,
+		textShadowRadius: 10,
+		textShadowColor: '#000'
 	}
 });
+
 
 export default HomeScreen;
