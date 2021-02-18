@@ -11,8 +11,8 @@ import ClosetScreen from './src/screens/ClosetScreen';
 import LooksScreen from './src/screens/LooksScreen';
 import CalendarScreen from './src/screens/CalendarScreen';
 import CameraScreen from './src/screens/CameraScreen';
-
-const Stack = createStackNavigator();
+import SignInScreen from './src/screens/SignInScreen';
+import SignUpScreen from './src/screens/SignUpScreen';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCSq1dCcfJvHIW4Fo22UzQ5pwALd2X3vu8",
@@ -23,6 +23,7 @@ const firebaseConfig = {
     messagingSenderId: "989275616193",
     appId: "1:989275616193:web:642d08e1d183c75b64f540",
 };
+
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
@@ -36,11 +37,52 @@ let customFonts = {
     'montserrat-regular': require('./assets/fonts/Montserrat-Regular.ttf'),
     'roboto-light': require('./assets/fonts/Roboto-Light.ttf')
 };
+const AppStack = createStackNavigator();
+
+const MainStack = () => {
+    return (
+        <AppStack.Navigator initialRouteName="Home">
+            <AppStack.Screen name="Home" component={HomeScreen} options={{
+                title: 'MyLook',
+                headerTitleStyle: style.headerTitle
+            }}/>
+            <AppStack.Screen name="Closet" component={ClosetScreen} options={{
+                title: 'Closet',
+                headerTitleStyle: style.headerTitle
+            }}/>
+            <AppStack.Screen name="Looks" component={LooksScreen} options={{
+                title: 'Looks',
+                headerTitleStyle: style.headerTitle
+            }}/>
+            <AppStack.Screen name="Calendar" component={CalendarScreen} options={{
+                title: 'Calendar',
+                headerTitleStyle: style.headerTitle
+            }}/>
+            <AppStack.Screen name="Camera" component={CameraScreen} options={{
+                title: 'Camera',
+                headerShown: false
+            }}/>
+        </AppStack.Navigator>
+    );
+}
+
+const AuthStack = () => {
+    return(
+        <AppStack.Navigator initialRouteName="SignIn">
+            <AppStack.Screen name="SignIn" component={SignInScreen} options={{headerShown: false}}/>
+            <AppStack.Screen name="SignUp" component={SignUpScreen} options={{headerShown: false}}/>
+            <AppStack.Screen name="MainStack" component={MainStack} options={{headerShown: false}}/>
+        </AppStack.Navigator>
+    );
+}
 
 export default class App extends React.Component {
+
     state = {
-        fontsLoaded: false
-    };
+        fontsLoaded: false,
+    }
+
+    user = firebase.auth().currentUser;
 
     async _loadFontsAsync() {
         await Font.loadAsync(customFonts);
@@ -50,33 +92,16 @@ export default class App extends React.Component {
     componentDidMount() {
         this._loadFontsAsync();
     }
+
     render()
     {
         if (this.state.fontsLoaded) {
+
             return (
                 <NavigationContainer>
-                    <Stack.Navigator initialRouteName="Home">
-                        <Stack.Screen name="Home" component={HomeScreen} options={{
-                            title: 'MyLook',
-                            headerTitleStyle: style.headerTitle
-                        }}/>
-                        <Stack.Screen name="Closet" component={ClosetScreen} options = {{
-                            title: 'Closet',
-                            headerTitleStyle: style.headerTitle
-                        }}/>
-                        <Stack.Screen name="Looks" component={LooksScreen} options = {{
-                            title: 'Looks',
-                            headerTitleStyle: style.headerTitle
-                        }}/>
-                        <Stack.Screen name="Calendar" component={CalendarScreen} options = {{
-                            title: 'Calendar',
-                            headerTitleStyle: style.headerTitle
-                        }}/>
-                        <Stack.Screen name="Camera" component={CameraScreen} options = {{
-                            title: 'Camera',
-                            headerShown: false
-                        }}/>
-                    </Stack.Navigator>
+                {
+                    this.user ? (<MainStack/>) : (<AuthStack/>)
+                }
                 </NavigationContainer>
             );
         } else {
