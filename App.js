@@ -45,7 +45,7 @@ const MainStack = () => {
         <AppStack.Navigator initialRouteName="Home">
             <AppStack.Screen name="Home" component={HomeScreen} options={{
                 title: 'MyLook',
-                headerTitleStyle: style.headerTitle
+                headerTitleStyle: style.headerTitle,
             }}/>
             <AppStack.Screen name="Closet" component={ClosetScreen} options={{
                 title: 'Closet',
@@ -103,7 +103,7 @@ export default function App() {
     }, {
         isLoading: true,
         isSignout: false,
-        userToken: null,
+        userToken: null,  
         }
     );
 
@@ -111,9 +111,14 @@ export default function App() {
         await Font.loadAsync(customFonts);
         setFontsLoaded(true);
 
-        let userToken;
-        userToken = await firebase.auth().currentUser;
-        dispatch({type: 'RESTORE_TOKEN', token: userToken});
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                dispatch({type: 'RESTORE_TOKEN', token: user});
+            }
+            else {
+                dispatch({type: 'RESTORE_TOKEN', token: null});
+            }
+        });
     };
 
     useEffect(() => {
@@ -124,8 +129,9 @@ export default function App() {
         () => ({
             signIn: async data => {
                 await firebase
-                    .auth()
-                    .signInWithEmailAndPassword(data.email, data.password);
+                      .auth()
+                      .signInWithEmailAndPassword(data.email, data.password);
+
                 //add error handling
                 let user = await firebase.auth().currentUser;
                 dispatch({ type: 'SIGN_IN', token: user });
@@ -138,13 +144,14 @@ export default function App() {
                 await firebase
                 .auth()
                 .createUserWithEmailAndPassword(data.email, data.password);
+                
                 //add error handling
                 let user = await firebase.auth().currentUser;
                 dispatch({ type: 'SIGN_IN', token: user });
     }
         }),[]
     );
-    if (fontsLoaded) {
+    if (fontsLoaded && !state.isLoading) {     
         return (
             <AuthContext.Provider value={authContext}>
                 <NavigationContainer>
