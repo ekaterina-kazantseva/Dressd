@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext, useState} from "react";
 import {
   StyleSheet,
   View,
@@ -13,41 +13,14 @@ import {
 } from "react-native";
 import "firebase/firestore";
 import firebase from "firebase";
+import {AuthContext} from '../../App.js';
 
-class SignInScreen extends React.Component {
-  state = { email: '', password: '', errorMessage: '', loading: false };
-  onLoginSuccess() {
-    this.props.navigation.navigate('Home');
-  }
-  onLoginFailure(errorMessage) {
-    this.setState({ error: errorMessage, loading: false });
-  }
-  renderLoading() {
-    if (this.state.loading) {
-      return (
-        <View>
-          <ActivityIndicator size={'large'} />
-        </View>
-      );
-    }
-  }
-  async signInWithEmail() {
-    await firebase
-      .auth()
-      .signInWithEmailAndPassword(this.state.email, this.state.password)
-      .then(this.onLoginSuccess.bind(this))
-      .catch(error => {
-          let errorCode = error.code;
-          let errorMessage = error.message;
-          if (errorCode == 'auth/weak-password') {
-              this.onLoginFailure.bind(this)('Weak Password!');
-          } else {
-              this.onLoginFailure.bind(this)(errorMessage);
-          }
-      });
-  }
+const SignInScreen = ({navigation}) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  render() {
+  const { signIn } = useContext(AuthContext);
+
     return (
       <TouchableWithoutFeedback
         onPress={() => {
@@ -57,7 +30,7 @@ class SignInScreen extends React.Component {
         <SafeAreaView style={{ flex: 1 }}>
           <KeyboardAvoidingView style={styles.container} behavior="padding">
             <Text style={{ fontSize: 32, fontWeight: "700", color: "gray" }}>
-              App Name
+              MyLook
             </Text>
             <View style={styles.form}>
               <TextInput
@@ -67,8 +40,8 @@ class SignInScreen extends React.Component {
                 returnKeyType="next"
                 keyboardType="email-address"
                 textContentType="emailAddress"
-                value={this.state.email}
-                onChangeText={email => this.setState({ email })}
+                value={email}
+                onChangeText={email => setEmail(email)}
               />
               <TextInput
                 style={styles.input}
@@ -77,31 +50,20 @@ class SignInScreen extends React.Component {
                 returnKeyType="done"
                 textContentType="newPassword"
                 secureTextEntry={true}
-                value={this.state.password}
-                onChangeText={password => this.setState({ password })}
+                value={password}
+                onChangeText={password => setPassword(password)}
               />
             </View>
-            {this.renderLoading()}
-            <Text
-              style={{
-                fontSize: 18,
-                textAlign: "center",
-                color: "red",
-                width: "80%"
-              }}
-            >
-              {this.state.error}
-            </Text>
             <TouchableOpacity
               style={{ width: '86%', marginTop: 10 }}
-              onPress={() => this.signInWithEmail()}>
+              onPress={() => signIn({ email, password })}>
                   <Text>Sign In</Text>
             </TouchableOpacity>
             <View style={{ marginTop: 10 }}>
               <Text
                 style={{ fontWeight: "200", fontSize: 17, textAlign: "center" }}
                 onPress={() => {
-                  this.props.navigation.navigate("SignUp");
+                  navigation.navigate("SignUp");
                 }}
               >
                 Don't have an Account?
@@ -111,7 +73,6 @@ class SignInScreen extends React.Component {
         </SafeAreaView>
       </TouchableWithoutFeedback>
     );
-  }
 }
 const styles = StyleSheet.create({
   container: {
