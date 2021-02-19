@@ -1,13 +1,21 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, ImageBackground} from 'react-native';
 import ClosetImage from '../../assets/closet.png';
 import LooksImage from '../../assets/looks.png';
 import CalendarImage from '../../assets/calendar.png';
+import firebase from "firebase";
+import {AuthContext} from '../../App.js';
 
-const HomeScreen = ({navigation}) => {
+
+const HomeScreen = ({navigation}) => {  
+
+	const { signOut } = useContext(AuthContext);
 
 	return (
 		<View style={{backgroundColor: '#fff', flex: 1}}>
+			<TouchableOpacity onPress = {() => signOut()} style={{width: 30, heigh: 30, backgroundColor: 'black', position: 'absolute', margin: 170}}>
+				<Text style={{color: 'white'}}>Sign Out</Text>
+			</TouchableOpacity>
 				<TouchableOpacity onPress = {() => navigation.navigate('Closet')} style={style.buttonStyle}>
 					<ImageBackground source={ClosetImage} style={style.image}>
 						<Text style={style.text}>Closet</Text>
