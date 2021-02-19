@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect, useMemo, createContext} from 'react';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
 import * as Font from 'expo-font';
@@ -38,6 +38,7 @@ let customFonts = {
     'roboto-light': require('./assets/fonts/Roboto-Light.ttf')
 };
 const AppStack = createStackNavigator();
+export const AuthContext = React.createContext();
 
 const MainStack = () => {
     return (
@@ -54,13 +55,13 @@ const MainStack = () => {
                 title: 'Looks',
                 headerTitleStyle: style.headerTitle
             }}/>
-            <AppStack.Screen name="Calendar" component={CalendarScreen} options={{
-                title: 'Calendar',
-                headerTitleStyle: style.headerTitle
-            }}/>
             <AppStack.Screen name="Camera" component={CameraScreen} options={{
                 title: 'Camera',
                 headerShown: false
+            }}/>
+            <AppStack.Screen name="Calendar" component={CalendarScreen} options={{
+                title: 'Calendar',
+                headerTitleStyle: style.headerTitle
             }}/>
         </AppStack.Navigator>
     );
@@ -71,42 +72,92 @@ const AuthStack = () => {
         <AppStack.Navigator initialRouteName="SignIn">
             <AppStack.Screen name="SignIn" component={SignInScreen} options={{headerShown: false}}/>
             <AppStack.Screen name="SignUp" component={SignUpScreen} options={{headerShown: false}}/>
-            <AppStack.Screen name="MainStack" component={MainStack} options={{headerShown: false}}/>
         </AppStack.Navigator>
     );
 }
 
-export default class App extends React.Component {
+export default function App() {
+    const [fontsLoaded, setFontsLoaded] = React.useState(false);
 
-    state = {
-        fontsLoaded: false,
-    }
-
-    user = firebase.auth().currentUser;
-
-    async _loadFontsAsync() {
-        await Font.loadAsync(customFonts);
-        this.setState({fontsLoaded: true});
-    }
-
-    componentDidMount() {
-        this._loadFontsAsync();
-    }
-
-    render()
-    {
-        if (this.state.fontsLoaded) {
-
-            return (
-                <NavigationContainer>
-                {
-                    this.user ? (<MainStack/>) : (<AuthStack/>)
-                }
-                </NavigationContainer>
-            );
-        } else {
-            return <AppLoading />;
+    const [state, dispatch] = React.useReducer((prevState, action) => {
+        switch(action.type) {
+            case 'RESTORE_TOKEN':
+                return {
+                    ...prevState,
+                    userToken: action.token,
+                    isLoading: false,
+                };
+            case 'SIGN_IN':
+                return {
+                    ...prevState,
+                    isSignout: false,
+                    userToken: action.token,
+                };
+            case 'SIGN_OUT':
+                return {
+                    ...prevState,
+                    isSignout: true,
+                    userToken: null,
+                };
         }
+    }, {
+        isLoading: true,
+        isSignout: false,
+        userToken: null,
+        }
+    );
+
+    const bootstrapAsync = async () => {
+        await Font.loadAsync(customFonts);
+        setFontsLoaded(true);
+
+        let userToken;
+        userToken = await firebase.auth().currentUser;
+        dispatch({type: 'RESTORE_TOKEN', token: userToken});
+    };
+
+    useEffect(() => {
+        bootstrapAsync();
+    }, []);
+
+    const authContext = React.useMemo(
+        () => ({
+            signIn: async data => {
+                await firebase
+                    .auth()
+                    .signInWithEmailAndPassword(data.email, data.password);
+                //add error handling
+                let user = await firebase.auth().currentUser;
+                dispatch({ type: 'SIGN_IN', token: user });
+            },
+            signOut: async data => {
+                firebase.auth().signOut();
+                dispatch({type: 'SIGN_OUT'});
+            },
+            signUp: async data => {
+                await firebase
+                .auth()
+                .createUserWithEmailAndPassword(data.email, data.password);
+                //add error handling
+                let user = await firebase.auth().currentUser;
+                dispatch({ type: 'SIGN_IN', token: user });
+    }
+        }),[]
+    );
+    if (fontsLoaded) {
+        return (
+            <AuthContext.Provider value={authContext}>
+                <NavigationContainer>
+                    {
+                        state.userToken ?
+                            (<MainStack/>)
+                        : (<AuthStack/>)
+                    }
+                </NavigationContainer>
+            </AuthContext.Provider>
+        );
+    } else {
+        return <AppLoading / >
     }
 }
 
