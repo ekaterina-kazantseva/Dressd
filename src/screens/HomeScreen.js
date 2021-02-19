@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+ct, {useContext, useLayoutEffect} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, ImageBackground} from 'react-native';
 import ClosetImage from '../../assets/closet.png';
 import LooksImage from '../../assets/looks.png';
@@ -11,11 +11,16 @@ const HomeScreen = ({navigation}) => {
 
 	const { signOut } = useContext(AuthContext);
 
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<TouchableOpacity onPress = {() => signOut()}><Text style={{fontFamily: 'montserrat-regular', color: 'black', fontSize: 18, margin: 5}}>Sign Out</Text></TouchableOpacity>
+			)
+		});
+	}, [navigation]);
+
 	return (
 		<View style={{backgroundColor: '#fff', flex: 1}}>
-			<TouchableOpacity onPress = {() => signOut()} style={{width: 30, heigh: 30, backgroundColor: 'black', position: 'absolute', margin: 170}}>
-				<Text style={{color: 'white'}}>Sign Out</Text>
-			</TouchableOpacity>
 				<TouchableOpacity onPress = {() => navigation.navigate('Closet')} style={style.buttonStyle}>
 					<ImageBackground source={ClosetImage} style={style.image}>
 						<Text style={style.text}>Closet</Text>
