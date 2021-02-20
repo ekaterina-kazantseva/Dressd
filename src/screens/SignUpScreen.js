@@ -56,7 +56,7 @@ const SignUpScreen = ({navigation}) => {
             </View>
             <TouchableOpacity
               style={{ width: '86%', marginTop: 10 }}
-              onPress={() => singUp({ email, password})}
+              onPress={() => signUp({ email, password})}
             >
                 <Text>Sign Up</Text>
             </TouchableOpacity>
