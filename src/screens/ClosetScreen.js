@@ -1,49 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, ImageBackground} from 'react-native';
 import SubCategories from '../library/components/SubCategories';
-
-let topsCategories = [
-	{ name: 'Shirts', isExpanded: false},
-	{ name: 'T-Shirts', isExpanded: false},
-	{ name: 'Sweaters', isExpanded: false},
-	{ name: 'Blazers', isExpanded: false}
-]
-
-let botsCategories = [
-	{ name: 'Pants', isExpanded: false},
-	{ name: 'Shorts', isExpanded: false},
-	{ name: 'Skirts', isExpanded: false},
-]
-
-let accsCategories = [
-	{ name: 'Scarfs', isExpanded: false},
-	{ name: 'Bags', isExpanded: false},
-	{ name: 'Purses', isExpanded: false},
-	{ name: 'Jewelry', isExpanded: false}
-]
-
-let shoesCategories = [
-	{ name: 'Sneakers', isExpanded: false},
-	{ name: 'Pumps', isExpanded: false},
-	{ name: 'Stilletos', isExpanded: false},
-	{ name: 'Boots', isExpanded: false}
-]
-
-let dressRompersCategories = [ { name: 'Dresses', isExpanded: false} ]
-
-const allCategories = [
-	{group: topsCategories, name: "Tops", isExpanded: false},
-	{group: botsCategories, name: "Bottoms", isExpanded: false},
-	{group: accsCategories, name: "Accessories", isExpanded: false},
-	{group: shoesCategories, name: "Shoes", isExpanded: false},
-	{group: dressRompersCategories, name: "Dresses and Rompers", isExpanded: false}
-	]
+import * as firebase from 'firebase';
+import 'firebase/firestore';
+import clothesData from '../library/clothesData.js';
 
 
 export default function ClosetScreen() {
 	
 	const [buttonState, setButtonState] = useState([])
-	const [categoriesState, setNewCategories] = useState(allCategories)
+	const [categoriesState, setNewCategories] = useState(clothesData.allCategories)
 
 	const __changeCategories = (newSubCategories, index) => {
 		const newCategories = [...categoriesState];
@@ -58,11 +24,11 @@ export default function ClosetScreen() {
 	}
 
 	useEffect(() => {
-		if(allCategories.length > 0) {
-			const initialState = allCategories.map(item => item.isExpanded)
+		if(clothesData.allCategories.length > 0) {
+			const initialState = clothesData.allCategories.map(item => item.isExpanded)
 			setButtonState(initialState)
 		}
-	}, [allCategories]);
+	}, [clothesData.allCategories]);
 
 	return (
 			<View 
