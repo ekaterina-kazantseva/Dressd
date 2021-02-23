@@ -34,4 +34,4 @@ const allCategories = [
 	{group: shoesCategories, name: "Shoes", isExpanded: false},
 	{group: dressRompersCategories, name: "Dresses and Rompers", isExpanded: false}
 	]
-export default {allCategories};
+export default allCategories;
