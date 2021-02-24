@@ -9,7 +9,7 @@ import clothesData from '../library/clothesData.js';
 export default function ClosetScreen() {
 	
 	const [buttonState, setButtonState] = useState([])
-	const [categoriesState, setNewCategories] = useState(clothesData.allCategories)
+	const [categoriesState, setNewCategories] = useState(clothesData)
 
 	const __changeCategories = (newSubCategories, index) => {
 		const newCategories = [...categoriesState];
@@ -24,11 +24,11 @@ export default function ClosetScreen() {
 	}
 
 	useEffect(() => {
-		if(clothesData.allCategories.length > 0) {
-			const initialState = clothesData.allCategories.map(item => item.isExpanded)
+		if(clothesData.length > 0) {
+			const initialState = clothesData.map(item => item.isExpanded)
 			setButtonState(initialState)
 		}
-	}, [clothesData.allCategories]);
+	}, [clothesData]);
 
 	return (
 			<View 
