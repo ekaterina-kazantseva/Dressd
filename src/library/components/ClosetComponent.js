@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ImageBackground} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, ImageBackground, ScrollView} from 'react-native';
 import SubCategories from './SubCategories';
 
 export default ClosetComponent = ({data, onChangeCategories, index}) => {
@@ -20,17 +20,18 @@ export default ClosetComponent = ({data, onChangeCategories, index}) => {
 	}
 
 	return (
-		<View style={{flex: 1}}>
+		<ScrollView>
 			{data.map((item, idx) => <>
-				<TouchableOpacity
-					style={style.buttonStyle}
-					onPress = {() => handlePress(buttonState, idx)}>						
+				<TouchableOpacity style={style.buttonStyle} onPress = {() => handlePress(buttonState, idx)}>						
 					<Text style={style.textStyle}>{item.name}</Text>
 				</TouchableOpacity>
-				<SubCategories showSubCategories={buttonState[idx]} categories={data[idx].group}
-				onChangeCategories={(newSubCategories, index) => changeCategories(newSubCategories, index)} index={idx}/></>
+				<ScrollView>
+					<SubCategories showSubCategories={buttonState[idx]} categories={data[idx].group}
+					onChangeCategories={(newSubCategories, index) => changeCategories(newSubCategories, index)} index={idx}/>
+				</ScrollView>
+				</>
 			)}
-		</View>
+		</ScrollView>
 	);
 };
 
