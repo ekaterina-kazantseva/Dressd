@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, ImageBackground, ScrollView} from 'react-native';
 import SubCategories from './SubCategories';
 
-export default ClosetComponent = ({data, onChangeCategories, index}) => {
+export default ClosetComponent = ({data, onChangeSubCategories, index}) => {
 	const [buttonState, setButtonState] = useState([])
 
 	useEffect(() => {
@@ -26,8 +26,8 @@ export default ClosetComponent = ({data, onChangeCategories, index}) => {
 					<Text style={style.textStyle}>{item.name}</Text>
 				</TouchableOpacity>
 				<ScrollView>
-					<SubCategories showSubCategories={buttonState[idx]} categories={data[idx].group}
-					onChangeCategories={(newSubCategories, index) => changeCategories(newSubCategories, index)} index={idx}/>
+					<SubCategories showSubCategories={buttonState[idx]} subCategories={data[idx].group}
+					onChangeSubCategories={(newSubCategories, index) => changeSubCategories(newSubCategories, index)} index={idx}/>
 				</ScrollView>
 				</>
 			)}
